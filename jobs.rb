@@ -91,25 +91,28 @@ p Jobs.new("a =>
      f =>").result
 puts '//////////////////////'
 
-# struct = "a =>[]
-#   b =>[c]
-#   c =>[f]
-#   d =>[a]
-#   e =>[]
-#   f =>[b]"
+struct = "a =>
+  b =>[c]
+  c =>[f]
+  d =>[a]
+  e =>
+  f =>[b]"
 
-# begin
-#   p Jobs.new(struct).result
-# rescue "jobs can’t have circular dependencies"
-#   p $!
-# end
+ begin
+   p Jobs.new(struct).result
+ rescue "jobs can’t have circular dependencies"
+   p $!
+ end
 
-# puts 'trying for last error'
-# struct = ({:a=>[],:b=>[],:c=>[:c]})
-# begin
-#   p Jobs.new(struct).result
-# rescue
-#   p $!
-# end
+puts 'trying for last error'
+struct = "a=>
+b=>
+c=>[c]
+"
+begin
+  p Jobs.new(struct).result
+rescue
+  p $!
+end
 
-# p Jobs new('').result
+p Jobs.new('\'\'').result
