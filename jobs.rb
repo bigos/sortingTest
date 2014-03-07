@@ -8,6 +8,17 @@ class Hash
   def tsort_each_child(node, &block)
     fetch(node).each(&block)
   end
+
+  def parse_job_dependencies(str)
+    Hash[str.split("\n").collect{|x|
+           dependencies = x.strip.split("=>")
+           key = dependencies[0].strip.to_sym
+           if dependencies[1]
+             value = [ dependencies[1].delete('[]').strip.to_sym]
+           end
+           [ key, value == nil ? [] : value ]
+         }]
+  end
 end
 
 class Jobs < Hash
@@ -15,14 +26,7 @@ class Jobs < Hash
 
   def initialize(str)
     #p str
-    @structure = Hash[str.split("\n").collect{|x|
-                        dependencies = x.strip.split("=>")
-                        key = dependencies[0].strip.to_sym
-                        if dependencies[1]
-                          value = [ dependencies[1].delete('[]').strip.to_sym]
-                        end
-                        [ key, value == nil ? [] : value ]
-                      }]
+    @structure = parse_job_dependencies(str)
     #p @structure
     test_self_dependency
     @result = ''
