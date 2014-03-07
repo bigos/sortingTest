@@ -12,8 +12,9 @@ end
 
 class Jobs < Hash
   attr_reader :result
-  def initialize(structure)
-    @structure=structure
+  def initialize(str)
+    @structure = Hash[str.split("\n").collect{|x| x.strip.split("=>")}]
+
     test_self_dependency
     @result = ''
     sort
@@ -37,6 +38,8 @@ class Jobs < Hash
     end
   end
 end
+
+p({}.tsort)
 
 p ({:a=>[]}.tsort)
 
@@ -91,3 +94,5 @@ begin
 rescue
   p $!
 end
+
+p Jobs new('').result
