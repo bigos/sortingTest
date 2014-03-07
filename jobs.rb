@@ -15,16 +15,19 @@ class Jobs < Hash
   def initialize(str)
     p str
     @structure = Hash[str.split("\n").collect{|x|
-                        #p x
                         s= x.strip.split("=>")
-                        #p 'ss  '+s.inspect
                         a=s[0].strip.to_sym
                         if s[1]
                           b= [ s[1].delete('[]').strip.to_sym]
                         end
-                        [ a, b]
-                      }
-                     ]
+                        [ a,
+                          if b == nil
+                            []
+                          else
+                            b
+                          end
+                        ]
+                      }]
     p @structure
     test_self_dependency
     @result = ''
@@ -43,6 +46,8 @@ class Jobs < Hash
   end
   def test_self_dependency
     @structure.each do |key, value|
+      p key
+      value = [] unless value
       value.each do |v|
         raise "jobs can’t depend on themselves" if key == v
       end
