@@ -9,7 +9,7 @@ describe Fixnum do
 end
 
 describe Jobs do
-  it "testing arrays in Ruby" do
+  it "testing arrays equality" do
     expect(['a','b','c']).to eq(['a','b','c'])
   end
 end
