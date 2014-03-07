@@ -13,8 +13,19 @@ end
 class Jobs < Hash
   attr_reader :result
   def initialize(str)
-    @structure = Hash[str.split("\n").collect{|x| x.strip.split("=>")}]
-
+    p str
+    @structure = Hash[str.split("\n").collect{|x|
+                        #p x
+                        s= x.strip.split("=>")
+                        #p 'ss  '+s.inspect
+                        a=s[0].strip.to_sym
+                        if s[1]
+                          b= [ s[1].delete('[]').strip.to_sym]
+                        end
+                        [ a, b]
+                      }
+                     ]
+    p @structure
     test_self_dependency
     @result = ''
     sort
@@ -67,32 +78,33 @@ p ({ :a =>[],
 #############
 puts '----------------------'
 
-p Jobs.new({ :a =>[],
-     :b =>[:c],
-     :c =>[:f],
-     :d =>[:a],
-     :e =>[:b],
-     :f =>[]}).result
+p Jobs.new("a =>
+     b =>[c]
+     c =>[f]
+     d =>[a]
+     e =>[b]
+     f =>").result
 puts '//////////////////////'
 
-struct = { :a =>[],
-  :b =>[:c],
-  :c =>[:f],
-  :d =>[:a],
-  :e =>[],
-  :f =>[:b]}
-begin
-  p Jobs.new(struct).result
-rescue "jobs can’t have circular dependencies"
-  p $!
-end
+# struct = "a =>[]
+#   b =>[c]
+#   c =>[f]
+#   d =>[a]
+#   e =>[]
+#   f =>[b]"
 
-puts 'trying for last error'
-struct = ({:a=>[],:b=>[],:c=>[:c]})
-begin
-  p Jobs.new(struct).result
-rescue
-  p $!
-end
+# begin
+#   p Jobs.new(struct).result
+# rescue "jobs can’t have circular dependencies"
+#   p $!
+# end
 
-p Jobs new('').result
+# puts 'trying for last error'
+# struct = ({:a=>[],:b=>[],:c=>[:c]})
+# begin
+#   p Jobs.new(struct).result
+# rescue
+#   p $!
+# end
+
+# p Jobs new('').result
