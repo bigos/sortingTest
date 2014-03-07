@@ -11,19 +11,23 @@ class Hash
 end
 
 class Jobs < Hash
+  attr_reader :result
   def initialize(structure)
     @structure=structure
-    puts @structure.inspect+'***************'
     test_self_dependency
+    @result = ''
     sort
-    @structure
   end
   def sort
     begin
-      puts @structure.tsort.inspect
+      @structure.tsort.each do |e|
+        @result << e.to_s
+      end
+      p 'fffffffffff'+@result
     rescue Cyclic
       puts 'jobs can’t have circular dependencies'
     end
+    @result
   end
   def test_self_dependency
     @structure.each do |key, value|
@@ -59,6 +63,15 @@ p ({ :a =>[],
 
 #############
 puts '----------------------'
+
+p Jobs.new({ :a =>[],
+     :b =>[:c],
+     :c =>[:f],
+     :d =>[:a],
+     :e =>[:b],
+     :f =>[]}).result
+puts '//////////////////////'
+
 struct = { :a =>[],
   :b =>[:c],
   :c =>[:f],
@@ -66,12 +79,15 @@ struct = { :a =>[],
   :e =>[],
   :f =>[:b]}
 begin
-r = Jobs.new(struct)
+  p Jobs.new(struct).result
 rescue "jobs can’t have circular dependencies"
   p $!
 end
 
 puts 'trying for last error'
 struct = ({:a=>[],:b=>[],:c=>[:c]})
-
-Jobs.new(struct)
+begin
+  p Jobs.new(struct).result
+rescue
+  p $!
+end
