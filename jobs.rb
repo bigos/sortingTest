@@ -38,15 +38,12 @@ class Jobs < Hash
       @structure.tsort.each do |e|
         @result << e.to_s
       end
-      p 'fffffffffff'+@result
-    rescue Cyclic
-      puts 'jobs can’t have circular dependencies'
+    rescue TSort::Cyclic
+      raise 'jobs can’t have circular dependencies'
     end
-    @result
   end
   def test_self_dependency
     @structure.each do |key, value|
-      p key
       value = [] unless value
       value.each do |v|
         raise "jobs can’t depend on themselves" if key == v
@@ -55,20 +52,20 @@ class Jobs < Hash
   end
 end
 
-p({}.tsort)
+# p({}.tsort)
 
-p ({:a=>[]}.tsort)
+# p ({:a=>[]}.tsort)
 
-p ({:a=>[],:b=>[],:c=>[]}.tsort)
+# p ({:a=>[],:b=>[],:c=>[]}.tsort)
 
-p ({:a=>[], :b=>[:c], :c=>[]}.tsort)
+# p ({:a=>[], :b=>[:c], :c=>[]}.tsort)
 
-p ({ :a =>[],
-     :b =>[:c],
-     :c =>[:f],
-     :d =>[:a],
-     :e =>[:b],
-     :f =>[]}.tsort)
+# p ({ :a =>[],
+#      :b =>[:c],
+#      :c =>[:f],
+#      :d =>[:a],
+#      :e =>[:b],
+#      :f =>[]}.tsort)
 
 # p ({:a=>[],:b=>[],:c=>[:c]}.tsort)
 
@@ -81,38 +78,36 @@ p ({ :a =>[],
 
 
 #############
-puts '----------------------'
+# puts '----------------------'
 
-p Jobs.new("a =>
-     b =>[c]
-     c =>[f]
-     d =>[a]
-     e =>[b]
-     f =>").result
-puts '//////////////////////'
+# p Jobs.new("a =>
+#      b =>[c]
+#      c =>[f]
+#      d =>[a]
+#      e =>[b]
+#      f =>").result
+# puts '//////////////////////'
 
-struct = "a =>
-  b =>[c]
-  c =>[f]
-  d =>[a]
-  e =>
-  f =>[b]"
+# struct = "a =>
+#   b =>[c]
+#   c =>[f]
+#   d =>[a]
+#   e =>
+#   f =>[b]"
 
- begin
-   p Jobs.new(struct).result
- rescue "jobs can’t have circular dependencies"
-   p $!
- end
+#  begin
+#    p Jobs.new(struct).result
+#  rescue "jobs can’t have circular dependencies"
+#    p $!
+#  end
 
-puts 'trying for last error'
-struct = "a=>
-b=>
-c=>[c]
-"
-begin
-  p Jobs.new(struct).result
-rescue
-  p $!
-end
-
-p Jobs.new('\'\'').result
+# puts 'trying for last error'
+# struct = "a=>
+# b=>
+# c=>[c]
+# "
+# begin
+#   p Jobs.new(struct).result
+# rescue
+#   p $!
+# end
