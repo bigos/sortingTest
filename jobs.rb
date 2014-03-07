@@ -11,12 +11,25 @@ class Hash
 end
 
 class Jobs < Hash
-  def sort(structure)
-    puts 'going to sort'
+  def initialize(structure)
+    @structure=structure
+    puts @structure.inspect+'***************'
+    test_self_dependency
+    sort
+    @structure
+  end
+  def sort
     begin
-      puts structure.tsort.inspect
+      puts @structure.tsort.inspect
     rescue Cyclic
-      raise 'jobs can’t have circular dependencies'
+      puts 'jobs can’t have circular dependencies'
+    end
+  end
+  def test_self_dependency
+    @structure.each do |key, value|
+      value.each do |v|
+        raise "jobs can’t depend on themselves" if key == v
+      end
     end
   end
 end
@@ -45,10 +58,20 @@ p ({ :a =>[],
 
 
 #############
+puts '----------------------'
 struct = { :a =>[],
   :b =>[:c],
   :c =>[:f],
   :d =>[:a],
   :e =>[],
   :f =>[:b]}
-Jobs.new.sort struct
+begin
+r = Jobs.new(struct)
+rescue "jobs can’t have circular dependencies"
+  p $!
+end
+
+puts 'trying for last error'
+struct = ({:a=>[],:b=>[],:c=>[:c]})
+
+Jobs.new(struct)
