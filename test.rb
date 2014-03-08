@@ -39,4 +39,10 @@ describe Jobs do
       e =>
       f =>b').result}.to raise_error(RuntimeError,/jobs can’t have circular dependencies/)
   end
+  it "checks for enexpected data" do
+    expect{Jobs.new('a => b => c => ').result}.to raise_error(RuntimeError,/malformed data/)
+  end
+  it "checks for enexpected data" do
+    expect{Jobs.new('a => bc ').result}.to raise_error(RuntimeError,/one character long job symbols expected/)
+  end
 end

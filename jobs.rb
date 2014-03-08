@@ -11,12 +11,17 @@ class Hash
 
   def parse_job_dependencies(str)
     Hash[str.split("\n").collect{|line|
-           dependencies = line.split("=>")
-           key = dependencies[0].strip.to_sym
-           if dependencies[1]
-             value = [ dependencies[1].strip.delete('[]').to_sym]
+           key, val, *unexpected = line.split("=>")
+           raise "malformed data in: #{line}" unless unexpected.empty?
+           key = key.strip.to_sym
+           value = []
+           if val
+             valstr = val.strip.delete('[]')
+             raise "one character long job symbols expected" if valstr.size > 1
+             value << valsym = valstr.to_sym
+             raise "jobs can’t depend on themselves" if key == valsym
            end
-           [ key, value == nil ? [] : value ]
+           [key, value]
          }]
   end
 end
@@ -28,7 +33,6 @@ class Jobs < Hash
     #p str
     @structure = parse_job_dependencies(str)
     #p @structure
-    test_self_dependency
     @result = ''
     sort
   end
@@ -40,14 +44,6 @@ class Jobs < Hash
       end
     rescue TSort::Cyclic
       raise 'jobs can’t have circular dependencies'
-    end
-  end
-
-  def test_self_dependency
-    @structure.each do |key, value|
-      value.each do |v|
-        raise "jobs can’t depend on themselves" if key == v
-      end
     end
   end
 end
