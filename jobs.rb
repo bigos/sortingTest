@@ -12,7 +12,7 @@ class Hash
   def parse_job_dependencies(str)
     Hash[str.split("\n").collect{|line|
            key, val, *unexpected = line.split("=>")
-           raise "malformed data in: #{line}" unless unexpected.empty?
+           raise "malformed data in: #{line.inspect}" unless unexpected.empty?
            key = key.strip.to_sym
            value = []
            if val
