@@ -10,11 +10,11 @@ class Hash
   end
 
   def parse_job_dependencies(str)
-    Hash[str.split("\n").collect{|x|
-           dependencies = x.strip.split("=>")
+    Hash[str.split("\n").collect{|line|
+           dependencies = line.split("=>")
            key = dependencies[0].strip.to_sym
            if dependencies[1]
-             value = [ dependencies[1].delete('[]').strip.to_sym]
+             value = [ dependencies[1].strip.delete('[]').to_sym]
            end
            [ key, value == nil ? [] : value ]
          }]
@@ -45,7 +45,6 @@ class Jobs < Hash
 
   def test_self_dependency
     @structure.each do |key, value|
-      value ||= []
       value.each do |v|
         raise "jobs can’t depend on themselves" if key == v
       end
