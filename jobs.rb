@@ -8,8 +8,14 @@ class Hash
   def tsort_each_child(node, &block)
     fetch(node).each(&block)
   end
+end
 
-  def parse_job_dependencies(str)
+class Jobs < Hash
+  def initialize(jobs)
+    @structure = parse(jobs)
+  end
+
+  def parse(str)
     Hash[str.split("\n").collect{|line|
            key, val, *unexpected = line.split("=>")
            raise "malformed data in: #{line.inspect}" unless unexpected.empty?
@@ -21,29 +27,18 @@ class Hash
              value << valsym = valstr.to_sym
              raise "jobs can’t depend on themselves" if key == valsym
            end
-           [key, value]
-         }]
-  end
-end
-
-class Jobs < Hash
-  attr_reader :result
-
-  def initialize(str)
-    #p str
-    @structure = parse_job_dependencies(str)
-    #p @structure
-    @result = ''
-    sort
+           [key, value] }]
   end
 
   def sort
+    @sorted_jobs = ''
     begin
       @structure.tsort.each do |e|
-        @result << e.to_s
+        @sorted_jobs << e.to_s
       end
     rescue TSort::Cyclic
       raise 'jobs can’t have circular dependencies'
     end
+    @sorted_jobs
   end
 end
