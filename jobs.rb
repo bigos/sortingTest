@@ -12,7 +12,7 @@ end
 
 class Jobs < Hash
   def initialize(jobs)
-    @structure = parse(jobs)
+    @job_structure = parse(jobs)
   end
 
   def parse(str)
@@ -33,11 +33,11 @@ class Jobs < Hash
   def sort
     @sorted_jobs = ''
     begin
-      @structure.tsort.each do |e|
-        @sorted_jobs << e.to_s
+      @job_structure.tsort.each do |job|
+        @sorted_jobs << job.to_s
       end
     rescue TSort::Cyclic
-      raise 'jobs can’t have circular dependencies'
+      raise "jobs can’t have circular dependencies"
     end
     @sorted_jobs
   end
